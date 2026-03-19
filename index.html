@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saksham OS</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080808">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Saksham OS">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #080808;
+  --s1: #0f0f0f;
+  --s2: #161616;
+  --s3: #1e1e1e;
+  --border: #242424;
+  --border2: #2e2e2e;
+  --text: #efefef;
+  --muted: #484848;
+  --muted2: #666;
+  --podcast: #e8ff00;
+  --gym: #ff6b35;
+  --study: #00d4ff;
+  --personal: #c084fc;
+  --books: #4ade80;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  min-height: 100vh;
+}
+
+/* Noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* HEADER */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8,8,8,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 58px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #fff 0%, #888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted2);
+  letter-spacing: 2px;
+  margin-top: 1px;
+}
+
+/* NAV TABS */
+.nav-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.nav-tab {
+  padding: 7px 16px;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-tab:hover { color: var(--text); border-color: var(--border2); }
+.nav-tab.active { color: var(--text); border-color: var(--border2); background: var(--s2); }
+.nav-tab .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* MAIN */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* SECTION */
+.section { display: none; animation: fadeUp 0.3s ease; }
+.section.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: -0.5px;
+}
+
+.section-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted2);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+/* CARDS GRID */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  padding: 18px;
+  border-radius: 4px;
+  position: relative;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+.card-accent {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  border-radius: 4px 0 0 4px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  padding-left: 10px;
+}
+
+.card-actions { display: flex; gap: 6px; }
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 3px 6px;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+.icon-btn:hover { color: var(--text); background: var(--s3); }
+.icon-btn.del:hover { color: #ff4444; }
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 10px;
+}
+
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: var(--s3);
+  color: var(--muted2);
+  letter-spacing: 0.5px;
+}
+
+.tag.highlight { background: rgba(232,255,0,0.08); color: var(--podcast); }
+.tag.gym-tag { background: rgba(255,107,53,0.08); color: var(--gym); }
+.tag.study-tag { background: rgba(0,212,255,0.08); color: var(--study); }
+.tag.personal-tag { background: rgba(192,132,252,0.08); color: var(--personal); }
+.tag.books-tag { background: rgba(74,222,128,0.08); color: var(--books); }
+
+.card-note {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: var(--s2);
+  border-left: 2px solid var(--border2);
+  font-size: 12px;
+  color: var(--muted2);
+  font-style: italic;
+  line-height: 1.5;
+  padding-left: 18px;
+}
+
+/* STAR RATING */
+.stars { color: var(--books); font-size: 13px; letter-spacing: 1px; }
+
+/* STATUS BADGE */
+.status-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+.badge-done { background: rgba(74,222,128,0.12); color: var(--books); border: 1px solid rgba(74,222,128,0.2); }
+.badge-pending { background: rgba(255,107,53,0.12); color: var(--gym); border: 1px solid rgba(255,107,53,0.2); }
+.badge-reading { background: rgba(0,212,255,0.12); color: var(--study); border: 1px solid rgba(0,212,255,0.2); }
+
+/* RELATION METER */
+.relation-bar-wrap {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+.relation-label { font-family: 'JetBrains Mono'; font-size: 9px; color: var(--muted2); letter-spacing: 1px; margin-bottom: 5px; }
+.relation-bar { height: 3px; background: var(--s3); border-radius: 2px; overflow: hidden; }
+.relation-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+/* ADD BUTTON */
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--s1);
+  border: 1px dashed var(--border2);
+  color: var(--muted2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+.add-btn:hover { border-color: var(--text); color: var(--text); background: var(--s2); }
+.add-btn .plus { font-size: 18px; font-weight: 300; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-body { padding: 20px 24px; }
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted2);
+  letter-spacing: 1px;
+  margin-bottom: 7px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: var(--s2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 10px 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  border-radius: 3px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--muted2); }
+.form-group select option { background: var(--s2); }
+.form-group textarea { resize: vertical; min-height: 70px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 9px 20px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--muted2);
+  transition: all 0.15s;
+}
+.btn:hover { color: var(--text); border-color: var(--text); }
+.btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 700; }
+.btn.primary:hover { background: #ccc; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+.empty-text { font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 1px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* RANGE */
+input[type="range"] { accent-color: var(--personal); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-name">SAKSHAM OS</div>
+    <div class="brand-sub">LIFE MANAGEMENT SYSTEM</div>
+  </div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchSection('podcast', this)">
+      <span class="dot" style="background:var(--podcast)"></span> PODCAST
+    </button>
+    <button class="nav-tab" onclick="switchSection('gym', this)">
+      <span class="dot" style="background:var(--gym)"></span> GYM
+    </button>
+    <button class="nav-tab" onclick="switchSection('study', this)">
+      <span class="dot" style="background:var(--study)"></span> STUDY
+    </button>
+    <button class="nav-tab" onclick="switchSection('personal', this)">
+      <span class="dot" style="background:var(--personal)"></span> PERSONAL
+    </button>
+    <button class="nav-tab" onclick="switchSection('books', this)">
+      <span class="dot" style="background:var(--books)"></span> BOOKS
+    </button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- PODCAST -->
+  <div class="section active" id="section-podcast">
+    <div class="section-header">
+      <div>
+        <div class="section-count" id="podcast-count">0 EPISODES</div>
+        <div class="section-title" style="color:var(--podcast)">PODCAST</div>
+      </div>
+    </div>
+    <div class="cards-grid" id="podcast-grid"></div>
+    <button class="add-btn" onclick="openModal('podcast')"><span class="plus">+</span> ADD EPISODE</button>
+  </div>
+
+  <!-- GYM -->
+  <div class="section" id="section-gym">
+    <div class="section-header">
+      <div>
+        <div class="section-count" id="gym-count">0 ENTRIES</div>
+        <div class="section-title" style="color:var(--gym)">GYM</div>
+      </div>
+    </div>
+    <div class="cards-grid" id="gym-grid"></div>
+    <button class="add-btn" onclick="openModal('gym')"><span class="plus">+</span> ADD WORKOUT</button>
+  </div>
+
+  <!-- STUDY -->
+  <div class="section" id="section-study">
+    <div class="section-header">
+      <div>
+        <div class="section-count" id="study-count">0 SUBJECTS</div>
+        <div class="section-title" style="color:var(--study)">STUDY</div>
+      </div>
+    </div>
+    <div class="cards-grid" id="study-grid"></div>
+    <button class="add-btn" onclick="openModal('study')"><span class="plus">+</span> ADD SUBJECT</button>
+  </div>
+
+  <!-- PERSONAL -->
+  <div class="section" id="section-personal">
+    <div class="section-header">
+      <div>
+        <div class="section-count" id="personal-count">0 PEOPLE</div>
+        <div class="section-title" style="color:var(--personal)">PERSONAL LIFE</div>
+      </div>
+    </div>
+    <div class="cards-grid" id="personal-grid"></div>
+    <button class="add-btn" onclick="openModal('personal')"><span class="plus">+</span> ADD PERSON</button>
+  </div>
+
+  <!-- BOOKS -->
+  <div class="section" id="section-books">
+    <div class="section-header">
+      <div>
+        <div class="section-count" id="books-count">0 BOOKS</div>
+        <div class="section-title" style="color:var(--books)">BOOKS</div>
+      </div>
+    </div>
+    <div class="cards-grid" id="books-grid"></div>
+    <button class="add-btn" onclick="openModal('books')"><span class="plus">+</span> ADD BOOK</button>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">ADD</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">CANCEL</button>
+      <button class="btn primary" onclick="saveEntry()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// STATE
+let data = JSON.parse(localStorage.getItem('saksham-os') || '{"podcast":[],"gym":[],"study":[],"personal":[],"books":[]}');
+let currentSection = 'podcast';
+let editingId = null;
+
+function save() { localStorage.setItem('saksham-os', JSON.stringify(data)); }
+
+function genId() { return Date.now() + Math.random().toString(36).slice(2); }
+
+// NAV
+function switchSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  btn.classList.add('active');
+  currentSection = name;
+}
+
+// RENDER ALL
+function renderAll() {
+  renderPodcast(); renderGym(); renderStudy(); renderPersonal(); renderBooks();
+}
+
+// ─── PODCAST ───
+function renderPodcast() {
+  const items = data.podcast;
+  document.getElementById('podcast-count').textContent = items.length + ' EPISODE' + (items.length !== 1 ? 'S' : '');
+  const grid = document.getElementById('podcast-grid');
+  if (!items.length) { grid.innerHTML = emptyState('🎙', 'NO EPISODES YET'); return; }
+  grid.innerHTML = items.map(ep => `
+    <div class="card">
+      <div class="card-accent" style="background:var(--podcast)"></div>
+      <div class="card-header">
+        <div class="card-title">${ep.title || 'Untitled'}</div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editEntry('podcast','${ep.id}')">✎</button>
+          <button class="icon-btn del" onclick="deleteEntry('podcast','${ep.id}')">✕</button>
+        </div>
+      </div>
+      <div class="card-meta">
+        <span class="tag highlight">EP ${ep.epNum || '—'}</span>
+        <span class="tag highlight">${ep.type || 'Solo'}</span>
+        ${ep.type === 'Guest' && ep.guestName ? `<span class="tag">👤 ${ep.guestName}</span>` : ''}
+        ${ep.views ? `<span class="tag">👁 ${ep.views}</span>` : ''}
+        ${ep.date ? `<span class="tag">📅 ${ep.date}</span>` : ''}
+        ${ep.duration ? `<span class="tag">⏱ ${ep.duration}</span>` : ''}
+      </div>
+      ${ep.notes ? `<div class="card-note">${ep.notes}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ─── GYM ───
+function renderGym() {
+  const items = data.gym;
+  document.getElementById('gym-count').textContent = items.length + ' ENTR' + (items.length !== 1 ? 'IES' : 'Y');
+  const grid = document.getElementById('gym-grid');
+  if (!items.length) { grid.innerHTML = emptyState('🏋', 'NO WORKOUTS YET'); return; }
+  grid.innerHTML = items.map(g => `
+    <div class="card">
+      <div class="card-accent" style="background:var(--gym)"></div>
+      <div class="card-header">
+        <div class="card-title">${g.exercise || 'Exercise'}</div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editEntry('gym','${g.id}')">✎</button>
+          <button class="icon-btn del" onclick="deleteEntry('gym','${g.id}')">✕</button>
+        </div>
+      </div>
+      <div class="card-meta">
+        ${g.weight ? `<span class="tag gym-tag">🏋 ${g.weight} kg</span>` : ''}
+        ${g.reps ? `<span class="tag gym-tag">🔁 ${g.reps} reps</span>` : ''}
+        ${g.sets ? `<span class="tag gym-tag">× ${g.sets} sets</span>` : ''}
+        ${g.bw ? `<span class="tag">BW ${g.bw} kg</span>` : ''}
+        ${g.date ? `<span class="tag">📅 ${g.date}</span>` : ''}
+      </div>
+      ${g.notes ? `<div class="card-note">${g.notes}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ─── STUDY ───
+function renderStudy() {
+  const items = data.study;
+  document.getElementById('study-count').textContent = items.length + ' SUBJECT' + (items.length !== 1 ? 'S' : '');
+  const grid = document.getElementById('study-grid');
+  if (!items.length) { grid.innerHTML = emptyState('📚', 'NO SUBJECTS YET'); return; }
+  grid.innerHTML = items.map(s => `
+    <div class="card">
+      <div class="card-accent" style="background:var(--study)"></div>
+      <div class="card-header">
+        <div class="card-title">${s.subject || 'Subject'}</div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editEntry('study','${s.id}')">✎</button>
+          <button class="icon-btn del" onclick="deleteEntry('study','${s.id}')">✕</button>
+        </div>
+      </div>
+      <div class="card-meta">
+        ${s.hours ? `<span class="tag study-tag">⏱ ${s.hours}h studied</span>` : ''}
+        ${s.goal ? `<span class="tag study-tag">🎯 ${s.goal}</span>` : ''}
+        ${s.date ? `<span class="tag">📅 ${s.date}</span>` : ''}
+        ${s.status ? `<span class="tag">${s.status}</span>` : ''}
+      </div>
+      ${s.notes ? `<div class="card-note">${s.notes}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ─── PERSONAL ───
+function renderPersonal() {
+  const items = data.personal;
+  document.getElementById('personal-count').textContent = items.length + ' PEOPLE';
+  const grid = document.getElementById('personal-grid');
+  if (!items.length) { grid.innerHTML = emptyState('👤', 'NO PEOPLE ADDED'); return; }
+  grid.innerHTML = items.map(p => {
+    const rel = parseInt(p.relationScore) || 5;
+    const fillColor = rel >= 7 ? 'var(--books)' : rel >= 4 ? 'var(--podcast)' : 'var(--gym)';
+    return `
+    <div class="card">
+      <div class="card-accent" style="background:var(--personal)"></div>
+      <div class="card-header">
+        <div class="card-title">${p.name || 'Person'}</div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editEntry('personal','${p.id}')">✎</button>
+          <button class="icon-btn del" onclick="deleteEntry('personal','${p.id}')">✕</button>
+        </div>
+      </div>
+      <div class="card-meta">
+        ${p.relation ? `<span class="tag personal-tag">${p.relation}</span>` : ''}
+        ${p.since ? `<span class="tag">Since ${p.since}</span>` : ''}
+      </div>
+      <div class="relation-bar-wrap">
+        <div class="relation-label">BOND STRENGTH — ${rel}/10</div>
+        <div class="relation-bar"><div class="relation-fill" style="width:${rel*10}%;background:${fillColor}"></div></div>
+      </div>
+      ${p.notes ? `<div class="card-note">${p.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ─── BOOKS ───
+function renderBooks() {
+  const items = data.books;
+  document.getElementById('books-count').textContent = items.length + ' BOOK' + (items.length !== 1 ? 'S' : '');
+  const grid = document.getElementById('books-grid');
+  if (!items.length) { grid.innerHTML = emptyState('📖', 'NO BOOKS YET'); return; }
+  grid.innerHTML = items.map(b => {
+    const stars = '★'.repeat(parseInt(b.rating)||0) + '☆'.repeat(5-(parseInt(b.rating)||0));
+    const statusClass = b.status === 'Complete' ? 'badge-done' : b.status === 'Reading' ? 'badge-reading' : 'badge-pending';
+    return `
+    <div class="card">
+      <div class="card-accent" style="background:var(--books)"></div>
+      <div class="card-header">
+        <div class="card-title">${b.title || 'Book'}</div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editEntry('books','${b.id}')">✎</button>
+          <button class="icon-btn del" onclick="deleteEntry('books','${b.id}')">✕</button>
+        </div>
+      </div>
+      <div class="card-meta">
+        <span class="status-badge ${statusClass}">${b.status || 'Pending'}</span>
+        <span class="stars">${stars}</span>
+        ${b.author ? `<span class="tag">✍ ${b.author}</span>` : ''}
+        ${b.genre ? `<span class="tag">${b.genre}</span>` : ''}
+      </div>
+      ${b.notes ? `<div class="card-note">${b.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function emptyState(icon, text) {
+  return `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">${icon}</div><div class="empty-text">${text}</div></div>`;
+}
+
+// MODAL FORMS
+const forms = {
+  podcast: {
+    title: 'ADD EPISODE',
+    fields: `
+      <div class="form-row">
+        <div class="form-group"><label>EPISODE #</label><input type="number" id="f-epNum" placeholder="01"></div>
+        <div class="form-group"><label>DATE</label><input type="date" id="f-date"></div>
+      </div>
+      <div class="form-group"><label>TITLE</label><input type="text" id="f-title" placeholder="Episode title..."></div>
+      <div class="form-row">
+        <div class="form-group"><label>TYPE</label>
+          <select id="f-type" onchange="toggleGuestField()">
+            <option>Solo</option><option>Guest</option>
+          </select>
+        </div>
+        <div class="form-group"><label>DURATION</label><input type="text" id="f-duration" placeholder="e.g. 42 min"></div>
+      </div>
+      <div class="form-group" id="guest-field" style="display:none"><label>GUEST NAME</label><input type="text" id="f-guestName" placeholder="Guest's name"></div>
+      <div class="form-group"><label>VIEWS / LISTENS</label><input type="text" id="f-views" placeholder="e.g. 1.2K"></div>
+      <div class="form-group"><label>NOTES</label><textarea id="f-notes" placeholder="Episode notes..."></textarea></div>
+    `,
+    get: () => ({ epNum: v('epNum'), title: v('title'), type: v('type'), guestName: v('guestName'), date: v('date'), duration: v('duration'), views: v('views'), notes: v('notes') })
+  },
+  gym: {
+    title: 'LOG WORKOUT',
+    fields: `
+      <div class="form-group"><label>EXERCISE</label><input type="text" id="f-exercise" placeholder="e.g. Bench Press, Pull-ups..."></div>
+      <div class="form-row">
+        <div class="form-group"><label>WEIGHT (kg)</label><input type="number" id="f-weight" placeholder="0" step="0.5"></div>
+        <div class="form-group"><label>REPS</label><input type="number" id="f-reps" placeholder="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>SETS</label><input type="number" id="f-sets" placeholder="0"></div>
+        <div class="form-group"><label>BODYWEIGHT (kg)</label><input type="number" id="f-bw" placeholder="55" step="0.1"></div>
+      </div>
+      <div class="form-group"><label>DATE</label><input type="date" id="f-date"></div>
+      <div class="form-group"><label>NOTES</label><textarea id="f-notes" placeholder="How it felt, PRs, etc..."></textarea></div>
+    `,
+    get: () => ({ exercise: v('exercise'), weight: v('weight'), reps: v('reps'), sets: v('sets'), bw: v('bw'), date: v('date'), notes: v('notes') })
+  },
+  study: {
+    title: 'ADD SUBJECT',
+    fields: `
+      <div class="form-group"><label>SUBJECT</label><input type="text" id="f-subject" placeholder="e.g. Physics, Math..."></div>
+      <div class="form-group"><label>GOAL</label><input type="text" id="f-goal" placeholder="e.g. Complete Chapter 5, Score 90%..."></div>
+      <div class="form-row">
+        <div class="form-group"><label>HOURS STUDIED</label><input type="number" id="f-hours" placeholder="0" step="0.5"></div>
+        <div class="form-group"><label>DATE</label><input type="date" id="f-date"></div>
+      </div>
+      <div class="form-group"><label>STATUS</label>
+        <select id="f-status"><option>In Progress</option><option>Done</option><option>Pending</option></select>
+      </div>
+      <div class="form-group"><label>NOTES</label><textarea id="f-notes" placeholder="Topics covered, doubts..."></textarea></div>
+    `,
+    get: () => ({ subject: v('subject'), goal: v('goal'), hours: v('hours'), date: v('date'), status: v('status'), notes: v('notes') })
+  },
+  personal: {
+    title: 'ADD PERSON',
+    fields: `
+      <div class="form-group"><label>NAME</label><input type="text" id="f-name" placeholder="Person's name"></div>
+      <div class="form-row">
+        <div class="form-group"><label>RELATION</label><input type="text" id="f-relation" placeholder="e.g. Best Friend, Family..."></div>
+        <div class="form-group"><label>SINCE</label><input type="text" id="f-since" placeholder="e.g. 2021"></div>
+      </div>
+      <div class="form-group">
+        <label>BOND STRENGTH — <span id="bond-val">5</span>/10</label>
+        <input type="range" id="f-relationScore" min="1" max="10" value="5" oninput="document.getElementById('bond-val').textContent=this.value" style="width:100%;margin-top:6px">
+      </div>
+      <div class="form-group"><label>CURRENT STATUS / NOTES</label><textarea id="f-notes" placeholder="How things are going, recent updates..."></textarea></div>
+    `,
+    get: () => ({ name: v('name'), relation: v('relation'), since: v('since'), relationScore: v('relationScore'), notes: v('notes') })
+  },
+  books: {
+    title: 'ADD BOOK',
+    fields: `
+      <div class="form-group"><label>TITLE</label><input type="text" id="f-title" placeholder="Book title..."></div>
+      <div class="form-row">
+        <div class="form-group"><label>AUTHOR</label><input type="text" id="f-author" placeholder="Author name"></div>
+        <div class="form-group"><label>GENRE</label><input type="text" id="f-genre" placeholder="e.g. Psychology, Fiction..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>STATUS</label>
+          <select id="f-status"><option>Reading</option><option>Complete</option><option>Pending</option></select>
+        </div>
+        <div class="form-group"><label>RATING (1-5)</label>
+          <select id="f-rating"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>NOTES / TAKEAWAYS</label><textarea id="f-notes" placeholder="Key insights, fav quotes..."></textarea></div>
+    `,
+    get: () => ({ title: v('title'), author: v('author'), genre: v('genre'), status: v('status'), rating: v('rating'), notes: v('notes') })
+  }
+};
+
+function v(id) { const el = document.getElementById('f-'+id); return el ? el.value : ''; }
+
+function openModal(section, id = null) {
+  currentSection = section;
+  editingId = id;
+  const form = forms[section];
+  document.getElementById('modal-title').textContent = id ? 'EDIT ' + section.toUpperCase() : form.title;
+  document.getElementById('modal-body').innerHTML = form.fields;
+  document.getElementById('modal-overlay').classList.add('open');
+
+  // Set today's date default
+  const dateEl = document.getElementById('f-date');
+  if (dateEl && !id) dateEl.value = new Date().toISOString().split('T')[0];
+
+  // Fill existing data if editing
+  if (id) {
+    const item = data[section].find(x => x.id === id);
+    if (item) {
+      Object.keys(item).forEach(key => {
+        if (key === 'id') return;
+        const el = document.getElementById('f-' + key);
+        if (el) el.value = item[key];
+      });
+      if (section === 'personal') {
+        const bondVal = document.getElementById('bond-val');
+        if (bondVal) bondVal.textContent = item.relationScore || 5;
+      }
+      if (section === 'podcast') toggleGuestField();
+    }
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editingId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function toggleGuestField() {
+  const type = document.getElementById('f-type');
+  const field = document.getElementById('guest-field');
+  if (type && field) field.style.display = type.value === 'Guest' ? 'block' : 'none';
+}
+
+function saveEntry() {
+  const form = forms[currentSection];
+  const entry = form.get();
+  entry.id = editingId || genId();
+
+  if (editingId) {
+    const idx = data[currentSection].findIndex(x => x.id === editingId);
+    if (idx !== -1) data[currentSection][idx] = entry;
+  } else {
+    data[currentSection].unshift(entry);
+  }
+
+  save();
+  renderAll();
+  closeModal();
+}
+
+function editEntry(section, id) {
+  currentSection = section;
+  openModal(section, id);
+}
+
+function deleteEntry(section, id) {
+  if (!confirm('Delete this entry?')) return;
+  data[section] = data[section].filter(x => x.id !== id);
+  save();
+  renderAll();
+}
+
+// INIT
+renderAll();
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
+</script>
+</body>
+</html>
