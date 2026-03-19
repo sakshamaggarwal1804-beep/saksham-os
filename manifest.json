@@ -2,7 +2,7 @@
   "name": "Saksham OS",
   "short_name": "Saksham OS",
   "description": "Personal Life Management System",
-  "start_url": "/index.html",
+  "start_url": "/saksham-os/index.html"
   "display": "standalone",
   "background_color": "#080808",
   "theme_color": "#080808",
